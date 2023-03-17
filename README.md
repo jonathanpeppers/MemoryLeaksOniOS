@@ -26,3 +26,7 @@ view.RemoveFromSuperview();
 ```
 
 This is a problem in .NET MAUI, because they would have to explicitly call `RemoveFromSuperview()` many places to solve issues.
+
+To repro, click the button in the sample:
+
+![screenshot of a popup](screenshots/screenshot.png)
