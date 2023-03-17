@@ -56,6 +56,11 @@ public class AppDelegate : UIApplicationDelegate {
 		GC.Collect();
 		GC.WaitForPendingFinalizers();
 
+		// Ok! Two GCs works
+		await Task.Yield();
+		GC.Collect();
+		GC.WaitForPendingFinalizers();
+
 		new UIAlertView("Results",
 $"""
 new object() is alive: {objReference.IsAlive}

@@ -1,6 +1,14 @@
 # Memory Leaks on iOS
 
-The core issue is doing something like this:
+*UPDATE* it appears two GCs solves the issue, more investigation needed:
+
+```csharp
+await Task.Yield();
+GC.Collect();
+GC.WaitForPendingFinalizers();
+```
+
+The core issue was doing something like this:
 
 ```csharp
 class MyViewSubclass : UIView
