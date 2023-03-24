@@ -1,22 +1,16 @@
 # Memory Leaks on iOS
 
-*UPDATE* it appears two GCs solves the issue, more investigation needed:
-
-```csharp
-await Task.Yield();
-GC.Collect();
-GC.WaitForPendingFinalizers();
-```
-
 The core issue was doing something like this:
 
 ```csharp
 class MyViewSubclass : UIView
 {
-    public override void LayoutSubviews()
+    public UIView? Parent { get; set; }
+
+    public void Add(MyViewSubclass subview)
     {
-        Console.WriteLine("LayoutSubviews");
-        base.LayoutSubviews();
+        subview.Parent = this;
+        AddSubview(subview);
     }
 }
 
@@ -24,16 +18,16 @@ class MyViewSubclass : UIView
 
 var parent = new MyViewSubclass();
 var view = new MyViewSubclass();
-parent.AddSubview(view);
+parent.Add(view);
 ```
 
 Appears to leak unless you do:
 
 ```csharp
-view.RemoveFromSuperview();
+view.Parent = null;
 ```
 
-This is a problem in .NET MAUI, because they would have to explicitly call `RemoveFromSuperview()` many places to solve issues.
+This is a problem in .NET MAUI, because they would have to explicitly unset many values to solve issues.
 
 To repro, click the button in the sample:
 

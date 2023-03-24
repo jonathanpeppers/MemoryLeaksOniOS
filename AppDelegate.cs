@@ -35,31 +35,19 @@ public class AppDelegate : UIApplicationDelegate {
 
 			var parent = new MyViewSubclass();
 			var view = new MyViewSubclass();
-			parent.AddSubview(view);
+			parent.Add(view);
 			// Uncomment to solve the leak
-			//view.RemoveFromSuperview();
+			//view.Parent = null;
 			viewReference = new WeakReference(view);
-
-			// NOTE: the examples below work fine
-
-			/* Just one view works fine */
-			// viewReference = new WeakReference(new MyViewSubclass());
-
-			/* Using a UIView directly works fine */
-			// var parent = new UIView();
-			// var view = new UIView();
-			// parent.AddSubview(view);
-			// viewReference = new WeakReference(view);
 		}
 
-		await Task.Yield();
-		GC.Collect();
-		GC.WaitForPendingFinalizers();
-
-		// Ok! Two GCs works
-		await Task.Yield();
-		GC.Collect();
-		GC.WaitForPendingFinalizers();
+		// 10 GCs to just be thorough
+		for (int i = 0; i < 10; i++)
+		{
+			await Task.Yield();
+			GC.Collect();
+			GC.WaitForPendingFinalizers();
+		}
 
 		new UIAlertView("Results",
 $"""
@@ -72,10 +60,12 @@ new MyViewSubclass() is alive: {viewReference.IsAlive}
 
 	class MyViewSubclass : UIView
 	{
-		public override void LayoutSubviews()
+		public UIView? Parent { get; set; }
+
+		public void Add(MyViewSubclass subview)
 		{
-			Console.WriteLine("LayoutSubviews");
-			base.LayoutSubviews();
+			subview.Parent = this;
+			AddSubview(subview);
 		}
 	}
 }
