@@ -21,10 +21,11 @@ var view = new MyViewSubclass();
 parent.Add(view);
 ```
 
-Appears to leak unless you do:
+Appears to leak unless you do one of:
 
 ```csharp
 view.Parent = null;
+view.RemoveFromSuperview();
 ```
 
 This is a problem in .NET MAUI, because they would have to explicitly unset many values to solve issues.
