@@ -1,5 +1,7 @@
 # Memory Leaks on iOS
 
+See the [Xamarin.iOS history on this](https://stackoverflow.com/questions/13058521/is-this-a-bug-in-monotouch-gc/13059140#13059140).
+
 The core issue was doing something like this:
 
 ```csharp
