@@ -31,13 +31,8 @@ public class AppDelegate : UIApplicationDelegate {
 		WeakReference objReference, viewReference;
 
 		{
+			var view = new MyView();
 			objReference = new WeakReference(new object());
-
-			var parent = new MyViewSubclass();
-			var view = new MyViewSubclass();
-			parent.Add(view);
-			// Uncomment to solve the leak
-			//view.Parent = null;
 			viewReference = new WeakReference(view);
 		}
 
@@ -58,14 +53,19 @@ new MyViewSubclass() is alive: {viewReference.IsAlive}
 			null, "Ok").Show();
 	}
 
-	class MyViewSubclass : UIView
+	class MyView : UIView
 	{
-		public UIView? Parent { get; set; }
+		public UIDatePicker Picker { get; } = new UIDatePicker();
 
-		public void Add(MyViewSubclass subview)
+		public MyView()
 		{
-			subview.Parent = this;
-			AddSubview(subview);
+			AddSubview(Picker);
+			Picker.ValueChanged += OnValueChanged;
 		}
+
+		// Use this instead and it doesn't leak!
+		//static void OnValueChanged(object? sender, EventArgs e) { }
+
+		void OnValueChanged(object? sender, EventArgs e) { }
 	}
 }
