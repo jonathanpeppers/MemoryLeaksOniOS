@@ -33,12 +33,8 @@ public class AppDelegate : UIApplicationDelegate {
 		{
 			objReference = new WeakReference(new object());
 
-			var parent = new MyViewSubclass();
-			var view = new MyViewSubclass();
-			parent.Add(view);
-			// Uncomment to solve the leak
-			//view.Parent = null;
-			viewReference = new WeakReference(view);
+			var foo = new Foo();
+			viewReference = new WeakReference(foo);
 		}
 
 		// 10 GCs to just be thorough
@@ -52,20 +48,23 @@ public class AppDelegate : UIApplicationDelegate {
 		new UIAlertView("Results",
 $"""
 new object() is alive: {objReference.IsAlive}
-new MyViewSubclass() is alive: {viewReference.IsAlive}
+new Foo() is alive: {viewReference.IsAlive}
 """
 			,
 			null, "Ok").Show();
 	}
 
-	class MyViewSubclass : UIView
+	class Foo
 	{
-		public UIView? Parent { get; set; }
+		UIButton bar = new();
 
-		public void Add(MyViewSubclass subview)
+		public Foo()
 		{
-			subview.Parent = this;
-			AddSubview(subview);
+			bar.TouchUpInside += OnTouch;
 		}
+
+		public List<Foo> Foos { get; set; } = new();
+
+		void OnTouch(object sender, EventArgs e) { }
 	}
 }
